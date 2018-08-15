@@ -108,6 +108,14 @@ module LogStash; module Outputs; class ElasticSearch;
         @logger.info("No 'host' set in elasticsearch output. Defaulting to localhost")
         @hosts.replace(["localhost"])
       end
+
+      parsed_hosts = []
+      @hosts.each {|val|
+        parsed_hosts += val.uri.to_s.split(",").map {|uri|
+          LogStash::Util::SafeURI.new(uri)
+        }
+      }
+      @hosts = parsed_hosts
     end
 
     def maximum_seen_major_version
